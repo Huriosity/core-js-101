@@ -202,17 +202,32 @@ function extractEmails(str) {
  *             '└──────────┘\n'
  *
  */
-function getRectangleString() { // width, height) {
-  /* let willReturn = '';
+function getRectangleString(width, height) {
+  let willReturn = '┌'; // ;
+  //            //  + '└\n';
+  // const newWidth = width ;
+  // const newHeight = height - 2;
   for (let i = 0; i < height; i += 1) {
-    if (i === 0 || i === height - 1) {
-      for (let j = 0; j < width; j += 1) {
-        willReturn += '-';
+    if (i === 0) {
+      for (let j = 0; j < width - 2; j += 1) {
+        willReturn += '─';
       }
-      willReturn
+      willReturn += '┐\n';
+    } else if (i === height - 1) {
+      willReturn += '└';
+      for (let j = 0; j < width - 2; j += 1) {
+        willReturn += '─';
+      }
+      willReturn += '┘\n';
+    } else {
+      willReturn += '│';
+      for (let j = 0; j < width - 2; j += 1) {
+        willReturn += ' ';
+      }
+      willReturn += '│\n';
     }
-  } */
-  throw new Error('Not implemented');
+  }
+  return willReturn;
 }
 
 
@@ -232,8 +247,19 @@ function getRectangleString() { // width, height) {
  *    => 'NOPQRSTUVWXYZABCDEFGHIJKLMnopqrstuvwxyzabcdefghijklm'
  *
  */
-function encodeToRot13(/* str */) {
-  throw new Error('Not implemented');
+function encodeToRot13(str) {
+  let willReturn = str;
+  for (let i = 0; i < willReturn.length; i += 1) {
+    const symbID = willReturn.charCodeAt(i);
+    if ((symbID > 64 && symbID < 78) || (symbID > 96 && symbID < 110)) {
+      const willRepl = String.fromCharCode(symbID + 13);
+      willReturn = willReturn.substr(0, i) + willRepl + willReturn.substr(i + willRepl.length);
+    } else if ((symbID > 64 && symbID < 104) || (symbID > 96 && symbID < 136)) {
+      const willRepl = String.fromCharCode(symbID - 13);
+      willReturn = willReturn.substr(0, i) + willRepl + willReturn.substr(i + willRepl.length);
+    }
+  }
+  return willReturn;
 }
 
 /**
@@ -249,8 +275,13 @@ function encodeToRot13(/* str */) {
  *   isString('test') => true
  *   isString(new String('test')) => true
  */
-function isString(/* value */) {
-  throw new Error('Not implemented');
+function isString(value) {
+  if (value === undefined || value === null) {
+    return false;
+  }
+  const regExAlphabet = /([a-zA-Z])+/;
+  return regExAlphabet.test(value);
+  // throw new Error('Not implemented');
 }
 
 
@@ -278,8 +309,33 @@ function isString(/* value */) {
  *   'Q♠' => 50
  *   'K♠' => 51
  */
-function getCardId(/* value */) {
-  throw new Error('Not implemented');
+function getCardId(value) {
+  let id = 0;
+  const regExNum = new RegExp('^[0-9]$');
+  const regExCardBunners = new RegExp('([♦♥♠])+');
+  if (value[0] === 'J') {
+    id += 10;
+  } else if (value[0] === 'Q') {
+    id += 11;
+  } else if (value[0] === 'K') {
+    id += 12;
+  }
+  if (regExNum.test(value[0])) {
+    const valueNum = parseInt(value, 10);
+    id += valueNum - 1;
+  }
+  const findBunerId = value.search(regExCardBunners);
+  if (findBunerId !== -1) {
+    if (value[findBunerId] === '♦') {
+      id += 13;
+    } else if (value[findBunerId] === '♥') {
+      id += 26;
+    } else if (value[findBunerId] === '♠') {
+      id += 39;
+    }
+  }
+
+  return id;
 }
 
 
